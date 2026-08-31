@@ -12,9 +12,9 @@ func TestCommands(t *testing.T) {
 		want string
 	}{
 		{"../../cmd/01_goroutines", "compute=16\nstring=GO\njob=true"},
-		{"../../cmd/02_waitgroup", "tasks=2\nsquares=[4 9]\napplied=[11 12]"},
-		{"../../cmd/03_race_mutex", "counter=400"},
-		{"../../cmd/04_channels", "pair=10,20\nsum=6\nforward=true:go"},
+		{"../../cmd/02_channels", "pair=10,20\nsum=6\nforward=true:go"},
+		{"../../cmd/03_waitgroup", "tasks=2\nsquares=[4 9]\napplied=[11 12]"},
+		{"../../cmd/04_race_mutex", "counter=400"},
 		{"../../cmd/05_close_range", "generated=[0 1 2 3 4]\neven=[2 4 6]"},
 		{"../../cmd/06_select", "first=left:left-value:true\nsend=true\nreceive=ready"},
 		{"../../cmd/07_context", "check=context canceled\nvalue=done\nprocess=[2 4 6]"},

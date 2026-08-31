@@ -105,6 +105,80 @@ func TestRunAsync(t *testing.T) {
 	}
 }
 
+func TestSumAsync(t *testing.T) {
+	tests := []struct {
+		values []int
+		want   int
+	}{
+		{nil, 0},
+		{[]int{}, 0},
+		{[]int{0}, 0},
+		{[]int{1}, 1},
+		{[]int{-1}, -1},
+		{[]int{1, 2, 3}, 6},
+		{[]int{-2, 0, 2}, 0},
+		{[]int{5, 5, 5}, 15},
+		{[]int{10, -3, -2}, 5},
+		{[]int{100, 200, 300, 400}, 1000},
+	}
+	for _, tt := range tests {
+		if got := receiveInt(t, SumAsync(tt.values)); got != tt.want {
+			t.Fatalf("SumAsync(%v) = %d, want %d", tt.values, got, tt.want)
+		}
+	}
+}
+
+func TestCountAsync(t *testing.T) {
+	tests := []struct {
+		values    []string
+		predicate func(string) bool
+		want      int
+	}{
+		{nil, nil, 0},
+		{[]string{}, func(string) bool { return true }, 0},
+		{[]string{"go"}, nil, 1},
+		{[]string{"", "go"}, func(v string) bool { return v == "" }, 1},
+		{[]string{"a", "bb", "ccc"}, func(v string) bool { return len(v) >= 2 }, 2},
+		{[]string{"go", "rust", "go"}, func(v string) bool { return v == "go" }, 2},
+		{[]string{"A", "b", "C"}, func(v string) bool { return strings.ToUpper(v) == v }, 2},
+		{[]string{"1", "22", "333"}, func(v string) bool { return len(v)%2 == 1 }, 2},
+		{[]string{"x", "x", "x"}, func(string) bool { return false }, 0},
+		{[]string{"рус", "go", "язык"}, func(v string) bool { return strings.Contains(v, "я") }, 1},
+	}
+	for _, tt := range tests {
+		if got := receiveInt(t, CountAsync(tt.values, tt.predicate)); got != tt.want {
+			t.Fatalf("CountAsync(%v) = %d, want %d", tt.values, got, tt.want)
+		}
+	}
+}
+
+func TestCountAsyncStartsWorker(t *testing.T) {
+	started := make(chan struct{})
+	release := make(chan struct{})
+	result := CountAsync([]string{"go"}, func(string) bool {
+		close(started)
+		<-release
+		return true
+	})
+
+	select {
+	case <-started:
+	case <-time.After(time.Second):
+		t.Fatal("CountAsync did not start predicate in a goroutine")
+	}
+
+	select {
+	case <-result:
+		t.Fatal("CountAsync returned a result before predicate completed")
+	default:
+	}
+
+	close(release)
+	if got := receiveInt(t, result); got != 1 {
+		t.Fatalf("CountAsync() = %d, want 1", got)
+	}
+}
+
 func TestExample(t *testing.T) {
 	if got, want := Example(), "compute=16\nstring=GO\njob=true"; got != want {
 		t.Fatalf("Example() = %q, want %q", got, want)

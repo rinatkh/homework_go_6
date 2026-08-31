@@ -27,6 +27,18 @@ func ParallelAdd(workers, increments int) int {
 	return 0
 }
 
+// TODO: Swap должен под одной блокировкой заменить значение и вернуть прежнее.
+// Для nil receiver вернуть 0 и ничего не делать.
+func (c *Counter) Swap(value int) int {
+	return 0
+}
+
+// TODO: ParallelDeltas должен запустить отдельную goroutine для каждого delta,
+// безопасно применить все изменения к одному Counter, дождаться их и вернуть итог.
+func ParallelDeltas(deltas []int) int {
+	return 0
+}
+
 func Example() string {
 	return fmt.Sprintf("counter=%d", ParallelAdd(8, 50))
 }

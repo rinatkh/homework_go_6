@@ -7,17 +7,17 @@ BIN_DIR := bin
 COVERAGE_FILE ?= coverage.out
 COVERAGE_THRESHOLD ?= 80.0
 PACKAGE_FILE ?= $(BIN_DIR)/homework_go_6-linux-amd64.tar.gz
-CMDS := 01_goroutines 02_waitgroup 03_race_mutex 04_channels 05_close_range 06_select 07_context 08_generics
+CMDS := 01_goroutines 02_channels 03_waitgroup 04_race_mutex 05_close_range 06_select 07_context 08_generics
 
-.PHONY: help deps-check mod-check fmt fmt-check vet test test-unit test-integration test-race coverage coverage-check build package clean run-all ci compile test-goroutines test-waitgroup test-race-mutex test-channels test-close-range test-select test-context test-generics $(addprefix run-,$(CMDS))
+.PHONY: help deps-check mod-check fmt fmt-check vet test test-unit test-integration test-race coverage coverage-check build package clean run-all ci compile test-goroutines test-channels test-waitgroup test-race-mutex test-close-range test-select test-context test-generics $(addprefix run-,$(CMDS))
 
 help:
 	@echo "Available commands:"
 	@echo "  make compile          - compile all packages without running tests"
 	@echo "  make test-goroutines  - run goroutine tasks"
+	@echo "  make test-channels    - run channel tasks"
 	@echo "  make test-waitgroup   - run WaitGroup tasks"
 	@echo "  make test-race-mutex  - run shared-state tasks"
-	@echo "  make test-channels    - run channel tasks"
 	@echo "  make test-close-range - run close/range tasks"
 	@echo "  make test-select      - run select tasks"
 	@echo "  make test-context     - run context tasks"
@@ -62,14 +62,14 @@ compile:
 test-goroutines:
 	$(GO) test ./internal/goroutines/...
 
+test-channels:
+	$(GO) test ./internal/channels/...
+
 test-waitgroup:
 	$(GO) test ./internal/waitgroup/...
 
 test-race-mutex:
 	$(GO) test ./internal/racemutex/...
-
-test-channels:
-	$(GO) test ./internal/channels/...
 
 test-close-range:
 	$(GO) test ./internal/closerange/...
@@ -105,12 +105,12 @@ run-all:
 
 run-01_goroutines:
 	$(GO) run ./cmd/01_goroutines
-run-02_waitgroup:
-	$(GO) run ./cmd/02_waitgroup
-run-03_race_mutex:
-	$(GO) run ./cmd/03_race_mutex
-run-04_channels:
-	$(GO) run ./cmd/04_channels
+run-02_channels:
+	$(GO) run ./cmd/02_channels
+run-03_waitgroup:
+	$(GO) run ./cmd/03_waitgroup
+run-04_race_mutex:
+	$(GO) run ./cmd/04_race_mutex
 run-05_close_range:
 	$(GO) run ./cmd/05_close_range
 run-06_select:

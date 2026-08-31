@@ -1,6 +1,7 @@
 package channels
 
 import (
+	"reflect"
 	"testing"
 	"time"
 )
@@ -78,6 +79,73 @@ func TestForwardOne(t *testing.T) {
 	}
 	if len(out) != 0 {
 		t.Fatal("ForwardOne must not send after closed input")
+	}
+}
+
+func TestReceiveOne(t *testing.T) {
+	tests := []struct {
+		value  int
+		closed bool
+		want   int
+		wantOK bool
+	}{
+		{0, false, 0, true},
+		{1, false, 1, true},
+		{-1, false, -1, true},
+		{42, false, 42, true},
+		{-100, false, -100, true},
+		{999, false, 999, true},
+		{7, false, 7, true},
+		{5, false, 5, true},
+		{12345, false, 12345, true},
+		{0, true, 0, false},
+	}
+	for _, tt := range tests {
+		values := make(chan int, 1)
+		if tt.closed {
+			close(values)
+		} else {
+			values <- tt.value
+		}
+		got, ok := ReceiveOne(values)
+		if got != tt.want || ok != tt.wantOK {
+			t.Fatalf("ReceiveOne() = %d, %t; want %d, %t", got, ok, tt.want, tt.wantOK)
+		}
+	}
+}
+
+func TestRelayN(t *testing.T) {
+	tests := []struct {
+		values []int
+		count  int
+		want   []int
+	}{
+		{nil, 0, []int{}},
+		{[]int{1}, -1, []int{}},
+		{[]int{}, 3, []int{}},
+		{[]int{1}, 1, []int{1}},
+		{[]int{1, 2}, 1, []int{1}},
+		{[]int{1, 2}, 2, []int{1, 2}},
+		{[]int{1, 2}, 5, []int{1, 2}},
+		{[]int{-1, 0, 1}, 3, []int{-1, 0, 1}},
+		{[]int{5, 5, 5}, 2, []int{5, 5}},
+		{[]int{10, 20, 30, 40}, 4, []int{10, 20, 30, 40}},
+	}
+	for _, tt := range tests {
+		in := make(chan int, len(tt.values))
+		for _, value := range tt.values {
+			in <- value
+		}
+		close(in)
+		out := make(chan int, len(tt.values))
+		gotCount := RelayN(in, out, tt.count)
+		got := make([]int, 0, gotCount)
+		for index := 0; index < gotCount; index++ {
+			got = append(got, <-out)
+		}
+		if gotCount != len(tt.want) || !reflect.DeepEqual(got, tt.want) {
+			t.Fatalf("RelayN(%v, %d) = %v, %d; want %v, %d", tt.values, tt.count, got, gotCount, tt.want, len(tt.want))
+		}
 	}
 }
 

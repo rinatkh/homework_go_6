@@ -21,6 +21,18 @@ func ApplyAll(values []int, fn func(int) int) []int {
 	return []int{}
 }
 
+// TODO: SumParts должен запустить отдельную goroutine для каждой части,
+// посчитать сумму внутри части и сохранить суммы в исходном порядке частей.
+func SumParts(parts [][]int) []int {
+	return []int{}
+}
+
+// TODO: CountMatches должен конкурентно посчитать количество target в каждой
+// группе строк и вернуть счётчики в исходном порядке групп.
+func CountMatches(groups [][]string, target string) []int {
+	return []int{}
+}
+
 func Example() string {
 	var count atomic.Int32
 	RunAll([]func(){func() { count.Add(1) }, func() { count.Add(1) }})

@@ -20,6 +20,18 @@ func Drain[T any](values <-chan T) []T {
 	return []T{}
 }
 
+// TODO: Filter должен вернуть новый слайс только со значениями, для которых
+// keep вернул true. При keep == nil вернуть независимую копию values.
+func Filter[T any](values []T, keep func(T) bool) []T {
+	return []T{}
+}
+
+// TODO: IndexOf должен вернуть индекс первого target или -1, если target нет.
+// T ограничен comparable, потому что значения сравниваются через ==.
+func IndexOf[T comparable](values []T, target T) int {
+	return -1
+}
+
 func Example() string {
 	labels := Map([]int{1, 2, 3}, func(value int) string {
 		return fmt.Sprintf("item-%d", value)

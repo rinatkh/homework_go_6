@@ -82,6 +82,53 @@ func TestApplyAll(t *testing.T) {
 	}
 }
 
+func TestSumParts(t *testing.T) {
+	tests := []struct {
+		parts [][]int
+		want  []int
+	}{
+		{nil, []int{}},
+		{[][]int{}, []int{}},
+		{[][]int{{}}, []int{0}},
+		{[][]int{{1}}, []int{1}},
+		{[][]int{{-1}}, []int{-1}},
+		{[][]int{{1, 2}, {3}}, []int{3, 3}},
+		{[][]int{{-2, 0, 2}, {5, 5}}, []int{0, 10}},
+		{[][]int{{1}, {}, {2, 3}}, []int{1, 0, 5}},
+		{[][]int{{10, -3}, {-7, 7}, {100}}, []int{7, 0, 100}},
+		{[][]int{{1, 2, 3, 4}, {5, 6}, {-1, -2}}, []int{10, 11, -3}},
+	}
+	for _, tt := range tests {
+		if got := SumParts(tt.parts); !reflect.DeepEqual(got, tt.want) {
+			t.Fatalf("SumParts(%v) = %v, want %v", tt.parts, got, tt.want)
+		}
+	}
+}
+
+func TestCountMatches(t *testing.T) {
+	tests := []struct {
+		groups [][]string
+		target string
+		want   []int
+	}{
+		{nil, "go", []int{}},
+		{[][]string{}, "go", []int{}},
+		{[][]string{{}}, "go", []int{0}},
+		{[][]string{{"go"}}, "go", []int{1}},
+		{[][]string{{"rust"}}, "go", []int{0}},
+		{[][]string{{"go", "go"}, {"go"}}, "go", []int{2, 1}},
+		{[][]string{{"", "x", ""}, {""}}, "", []int{2, 1}},
+		{[][]string{{"a", "b"}, {}, {"a"}}, "a", []int{1, 0, 1}},
+		{[][]string{{"рус", "go"}, {"рус", "рус"}}, "рус", []int{1, 2}},
+		{[][]string{{"A", "a", "A"}, {"a"}}, "A", []int{2, 0}},
+	}
+	for _, tt := range tests {
+		if got := CountMatches(tt.groups, tt.target); !reflect.DeepEqual(got, tt.want) {
+			t.Fatalf("CountMatches(%v, %q) = %v, want %v", tt.groups, tt.target, got, tt.want)
+		}
+	}
+}
+
 func TestExample(t *testing.T) {
 	if got, want := Example(), "tasks=2\nsquares=[4 9]\napplied=[11 12]"; got != want {
 		t.Fatalf("Example() = %q, want %q", got, want)

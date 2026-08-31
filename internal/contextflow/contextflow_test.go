@@ -5,6 +5,7 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestCheck(t *testing.T) {
@@ -86,6 +87,87 @@ func TestProcess(t *testing.T) {
 	})
 	if !errors.Is(err, context.Canceled) || !reflect.DeepEqual(got, []int{2, 4}) {
 		t.Fatalf("Process(partial cancel) = %v, %v", got, err)
+	}
+}
+
+func TestSend(t *testing.T) {
+	values := []int{0, 1, -1, 10, 42, -100}
+	for _, value := range values {
+		out := make(chan int, 1)
+		if err := Send(context.Background(), out, value); err != nil {
+			t.Fatalf("Send(%d) error = %v", value, err)
+		}
+		if got := <-out; got != value {
+			t.Fatalf("Send(%d) sent %d", value, got)
+		}
+	}
+
+	for index := 0; index < 4; index++ {
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+		if err := Send(ctx, nil, index); !errors.Is(err, context.Canceled) {
+			t.Fatalf("Send(canceled) error = %v", err)
+		}
+	}
+}
+
+func TestCollectN(t *testing.T) {
+	channel := func(values []int, closed bool) <-chan int {
+		result := make(chan int, len(values))
+		for _, value := range values {
+			result <- value
+		}
+		if closed {
+			close(result)
+		}
+		return result
+	}
+
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		values  <-chan int
+		count   int
+		want    []int
+		wantErr error
+	}{
+		{"zero", context.Background(), nil, 0, []int{}, nil},
+		{"negative", context.Background(), nil, -1, []int{}, nil},
+		{"one", context.Background(), channel([]int{1}, false), 1, []int{1}, nil},
+		{"two of three", context.Background(), channel([]int{1, 2, 3}, false), 2, []int{1, 2}, nil},
+		{"all three", context.Background(), channel([]int{-1, 0, 1}, false), 3, []int{-1, 0, 1}, nil},
+		{"closed early", context.Background(), channel([]int{5}, true), 2, []int{5}, ErrClosed},
+		{"closed empty", context.Background(), channel(nil, true), 1, []int{}, ErrClosed},
+		{"duplicates", context.Background(), channel([]int{7, 7}, false), 2, []int{7, 7}, nil},
+	}
+
+	canceled, cancel := context.WithCancel(context.Background())
+	cancel()
+	tests = append(tests, struct {
+		name    string
+		ctx     context.Context
+		values  <-chan int
+		count   int
+		want    []int
+		wantErr error
+	}{"canceled", canceled, nil, 1, []int{}, context.Canceled})
+
+	deadline, cancelDeadline := context.WithDeadline(context.Background(), time.Unix(0, 0))
+	defer cancelDeadline()
+	tests = append(tests, struct {
+		name    string
+		ctx     context.Context
+		values  <-chan int
+		count   int
+		want    []int
+		wantErr error
+	}{"deadline", deadline, nil, 1, []int{}, context.DeadlineExceeded})
+
+	for _, tt := range tests {
+		got, err := CollectN(tt.ctx, tt.values, tt.count)
+		if !reflect.DeepEqual(got, tt.want) || !errors.Is(err, tt.wantErr) {
+			t.Fatalf("CollectN(%s) = %v, %v; want %v, %v", tt.name, got, err, tt.want, tt.wantErr)
+		}
 	}
 }
 

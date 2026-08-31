@@ -29,6 +29,20 @@ func ReceiveOrTimeout(in <-chan string, timeout <-chan time.Time) (string, error
 	return "", nil
 }
 
+// TODO: TryReceive должен неблокирующе получить одно число.
+// Вернуть value, true только для реально полученного значения; nil, пустой
+// или закрытый channel дают 0, false.
+func TryReceive(in <-chan int) (int, bool) {
+	return 0, false
+}
+
+// TODO: PrimaryOrFallback должен сначала неблокирующе проверить primary.
+// Если primary не готов, ждать значение из primary или fallback. Закрытый input
+// отключается; когда оба input закрыты или nil, вернуть "", "", false.
+func PrimaryOrFallback(primary, fallback <-chan string) (string, string, bool) {
+	return "", "", false
+}
+
 func Example() string {
 	left := make(chan string, 1)
 	left <- "left-value"

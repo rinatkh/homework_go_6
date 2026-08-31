@@ -2,6 +2,7 @@ package closerange
 
 import (
 	"reflect"
+	"sort"
 	"testing"
 	"time"
 )
@@ -94,6 +95,70 @@ func TestFilterEven(t *testing.T) {
 	for _, tt := range tests {
 		if got := collectWithTimeout(t, FilterEven(tt.in)); !reflect.DeepEqual(got, tt.want) {
 			t.Fatalf("FilterEven(%v) = %v, want %v", tt.in, got, tt.want)
+		}
+	}
+}
+
+func TestDouble(t *testing.T) {
+	tests := []struct {
+		in   []int
+		want []int
+	}{
+		{nil, []int{}},
+		{[]int{}, []int{}},
+		{[]int{0}, []int{0}},
+		{[]int{1}, []int{2}},
+		{[]int{-1}, []int{-2}},
+		{[]int{1, 2, 3}, []int{2, 4, 6}},
+		{[]int{-2, 0, 2}, []int{-4, 0, 4}},
+		{[]int{5, 5}, []int{10, 10}},
+		{[]int{10, -10}, []int{20, -20}},
+		{[]int{1, 2, 3, 4, 5}, []int{2, 4, 6, 8, 10}},
+	}
+	for _, tt := range tests {
+		if got := collectWithTimeout(t, Double(tt.in)); !reflect.DeepEqual(got, tt.want) {
+			t.Fatalf("Double(%v) = %v, want %v", tt.in, got, tt.want)
+		}
+	}
+}
+
+func TestMerge(t *testing.T) {
+	makeInput := func(values []int, useNil bool) <-chan int {
+		if useNil {
+			return nil
+		}
+		input := make(chan int, len(values))
+		for _, value := range values {
+			input <- value
+		}
+		close(input)
+		return input
+	}
+	tests := []struct {
+		leftNil  bool
+		rightNil bool
+		left     []int
+		right    []int
+		want     []int
+	}{
+		{true, true, nil, nil, []int{}},
+		{false, false, []int{}, []int{}, []int{}},
+		{false, true, []int{1}, nil, []int{1}},
+		{true, false, nil, []int{2}, []int{2}},
+		{false, false, []int{1}, []int{2}, []int{1, 2}},
+		{false, false, []int{1, 3}, []int{2, 4}, []int{1, 2, 3, 4}},
+		{false, false, []int{-1, 0}, []int{1}, []int{-1, 0, 1}},
+		{false, false, []int{5, 5}, []int{5}, []int{5, 5, 5}},
+		{false, false, []int{10, 20, 30}, []int{}, []int{10, 20, 30}},
+		{false, false, []int{100, -100}, []int{7, 8, 9}, []int{-100, 7, 8, 9, 100}},
+	}
+	for _, tt := range tests {
+		got := collectWithTimeout(t, Merge(makeInput(tt.left, tt.leftNil), makeInput(tt.right, tt.rightNil)))
+		sort.Ints(got)
+		want := append([]int{}, tt.want...)
+		sort.Ints(want)
+		if !reflect.DeepEqual(got, want) {
+			t.Fatalf("Merge(%v, %v) = %v, want values %v", tt.left, tt.right, got, want)
 		}
 	}
 }

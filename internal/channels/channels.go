@@ -23,6 +23,18 @@ func ForwardOne(in <-chan string, out chan<- string) bool {
 	return false
 }
 
+// TODO: ReceiveOne должен получить одно значение с comma-ok.
+// Для закрытого канала вернуть 0, false; ноль из открытого канала — обычное значение.
+func ReceiveOne(values <-chan int) (int, bool) {
+	return 0, false
+}
+
+// TODO: RelayN должен переслать не более count значений из in в out и вернуть
+// количество пересланных значений. Закрытый in завершает работу раньше.
+func RelayN(in <-chan int, out chan<- int, count int) int {
+	return 0
+}
+
 func Example() string {
 	pair := SendPair(10, 20)
 	first, second := <-pair, <-pair

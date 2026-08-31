@@ -66,6 +66,59 @@ func TestParallelAdd(t *testing.T) {
 	}
 }
 
+func TestCounterSwap(t *testing.T) {
+	tests := []struct {
+		start   int
+		value   int
+		wantOld int
+	}{
+		{0, 0, 0},
+		{0, 1, 0},
+		{1, 0, 1},
+		{-1, 1, -1},
+		{10, -3, 10},
+		{-5, -10, -5},
+		{42, 42, 42},
+		{100, 999, 100},
+		{-100, 100, -100},
+		{7, 3, 7},
+	}
+	for _, tt := range tests {
+		counter := &Counter{value: tt.start}
+		if got := counter.Swap(tt.value); got != tt.wantOld || counter.value != tt.value {
+			t.Fatalf("Counter.Swap(%d) = %d, value = %d; want %d, %d", tt.value, got, counter.value, tt.wantOld, tt.value)
+		}
+	}
+
+	var counter *Counter
+	if got := counter.Swap(10); got != 0 {
+		t.Fatalf("nil Counter.Swap() = %d, want 0", got)
+	}
+}
+
+func TestParallelDeltas(t *testing.T) {
+	tests := []struct {
+		deltas []int
+		want   int
+	}{
+		{nil, 0},
+		{[]int{}, 0},
+		{[]int{0}, 0},
+		{[]int{1}, 1},
+		{[]int{-1}, -1},
+		{[]int{1, 2, 3}, 6},
+		{[]int{-2, 0, 2}, 0},
+		{[]int{5, 5, 5, 5}, 20},
+		{[]int{100, -50, -25}, 25},
+		{[]int{1, -1, 2, -2, 3, -3, 10}, 10},
+	}
+	for _, tt := range tests {
+		if got := ParallelDeltas(tt.deltas); got != tt.want {
+			t.Fatalf("ParallelDeltas(%v) = %d, want %d", tt.deltas, got, tt.want)
+		}
+	}
+}
+
 func TestExample(t *testing.T) {
 	if got, want := Example(), "counter=400"; got != want {
 		t.Fatalf("Example() = %q, want %q", got, want)

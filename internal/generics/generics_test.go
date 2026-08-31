@@ -102,6 +102,68 @@ func TestDrain(t *testing.T) {
 	}
 }
 
+func TestFilter(t *testing.T) {
+	tests := []struct {
+		name string
+		got  any
+		want any
+	}{
+		{"nil", Filter([]int(nil), func(v int) bool { return v > 0 }), []int{}},
+		{"empty", Filter([]string{}, func(v string) bool { return v != "" }), []string{}},
+		{"all", Filter([]int{1, 2, 3}, func(v int) bool { return v > 0 }), []int{1, 2, 3}},
+		{"none", Filter([]int{1, 2, 3}, func(v int) bool { return v < 0 }), []int{}},
+		{"even", Filter([]int{-2, -1, 0, 1, 2}, func(v int) bool { return v%2 == 0 }), []int{-2, 0, 2}},
+		{"strings", Filter([]string{"", "go", "generic"}, func(v string) bool { return len(v) >= 2 }), []string{"go", "generic"}},
+		{"bool", Filter([]bool{true, false, true}, func(v bool) bool { return v }), []bool{true, true}},
+		{"duplicates", Filter([]string{"x", "x", "y"}, func(v string) bool { return v == "x" }), []string{"x", "x"}},
+		{"keep order", Filter([]int{3, 1, 2}, func(v int) bool { return v != 1 }), []int{3, 2}},
+		{"nil predicate", Filter([]int{1, 2, 3}, nil), []int{1, 2, 3}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if !reflect.DeepEqual(tt.got, tt.want) {
+				t.Fatalf("Filter() = %#v, want %#v", tt.got, tt.want)
+			}
+		})
+	}
+
+	input := []int{1, 2}
+	got := Filter(input, nil)
+	if len(got) > 0 {
+		got[0] = 99
+	}
+	if input[0] != 1 {
+		t.Fatal("Filter with nil predicate must return an independent slice")
+	}
+}
+
+func TestIndexOf(t *testing.T) {
+	type point struct{ X, Y int }
+	tests := []struct {
+		name string
+		got  int
+		want int
+	}{
+		{"nil", IndexOf([]int(nil), 1), -1},
+		{"empty", IndexOf([]string{}, "go"), -1},
+		{"first", IndexOf([]int{1, 2, 3}, 1), 0},
+		{"middle", IndexOf([]int{1, 2, 3}, 2), 1},
+		{"last", IndexOf([]int{1, 2, 3}, 3), 2},
+		{"missing", IndexOf([]int{1, 2, 3}, 4), -1},
+		{"first duplicate", IndexOf([]string{"go", "x", "go"}, "go"), 0},
+		{"empty string", IndexOf([]string{"go", ""}, ""), 1},
+		{"bool", IndexOf([]bool{false, true}, true), 1},
+		{"struct", IndexOf([]point{{1, 2}, {3, 4}}, point{3, 4}), 1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.got != tt.want {
+				t.Fatalf("IndexOf() = %d, want %d", tt.got, tt.want)
+			}
+		})
+	}
+}
+
 func TestExample(t *testing.T) {
 	if got, want := Example(), "map=[item-1 item-2 item-3]\nunique=[2 1 3]\ndrain=[go generic]"; got != want {
 		t.Fatalf("Example() = %q, want %q", got, want)

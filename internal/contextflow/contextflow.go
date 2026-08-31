@@ -27,6 +27,19 @@ func Process(ctx context.Context, values []int, fn func(int) int) ([]int, error)
 	return []int{}, nil
 }
 
+// TODO: Send должен ждать, пока out примет value, или пока завершится context.
+// Успешная отправка возвращает nil, отмена — ctx.Err().
+func Send(ctx context.Context, out chan<- int, value int) error {
+	return nil
+}
+
+// TODO: CollectN должен собрать ровно count значений, поддерживая отмену.
+// При раннем close вернуть частичный результат и ErrClosed; при отмене —
+// частичный результат и ctx.Err(). count <= 0 даёт пустой результат без ошибки.
+func CollectN(ctx context.Context, values <-chan int, count int) ([]int, error) {
+	return []int{}, nil
+}
+
 func Example() string {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()

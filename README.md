@@ -6,18 +6,18 @@
 
 | Раздел | Пакет | Количество задач |
 |---|---|---:|
-| Goroutines | `internal/goroutines` | 3 |
-| Channels | `internal/channels` | 3 |
-| WaitGroup | `internal/waitgroup` | 3 |
-| Race и Mutex | `internal/racemutex` | 3 |
-| Close и Range | `internal/closerange` | 3 |
-| Select | `internal/selectflow` | 3 |
-| Context | `internal/contextflow` | 3 |
-| Generics | `internal/generics` | 3 |
+| Goroutines | `internal/goroutines` | 5 |
+| Channels | `internal/channels` | 5 |
+| WaitGroup | `internal/waitgroup` | 5 |
+| Race и Mutex | `internal/racemutex` | 5 |
+| Close и Range | `internal/closerange` | 5 |
+| Select | `internal/selectflow` | 5 |
+| Context | `internal/contextflow` | 5 |
+| Generics | `internal/generics` | 5 |
 
-Всего: 24 функции и метода.
+Всего: 40 функций и методов — по 5 коротких задач в каждом разделе.
 
-Для каждой задачи предусмотрено 10 основных тестовых сценариев. Дополнительный `TestExample` проверяет итоговый вывод раздела, а integration-тест запускает все восемь `cmd`.
+Для каждой задачи предусмотрено не менее 10 основных тестовых сценариев. У каждой функции в `docs/task.md` есть одинаковые опоры: «Что тренируем», «Как рассуждать», «Мини-пример» и «Частая ошибка». Дополнительный `TestExample` проверяет итоговый вывод раздела, а integration-тест запускает все восемь `cmd`.
 
 ## Как не потеряться в конкурентности
 
@@ -30,6 +30,8 @@
 3. Реализуй только одну функцию.
 4. Запусти тесты текущего раздела.
 5. После блока с общей памятью обязательно запусти `make test-race`.
+
+Внутри каждого раздела сначала реши задачи 1–3 — они закрепляют основной механизм. Затем переходи к задачам 4–5: они повторяют тот же принцип в новом контексте и помогают проверить, что решение не было запомнено только для одного примера.
 
 Рекомендуемый маршрут:
 
@@ -46,7 +48,7 @@
 | 9 | Все unit- и integration-тесты | `make test` |
 | 10 | Полная проверка | `make ci` |
 
-В стартовом проекте TODO ещё не реализованы, поэтому тесты сначала красные. Это ожидаемо. Заглушки специально не должны зависать: они позволяют компилировать проект и постепенно делать зелёным каждый раздел.
+В стартовом проекте TODO ещё не реализованы, поэтому тесты и GitHub Actions сначала красные. Это ожидаемо. Заглушки специально не должны зависать: они позволяют компилировать проект и постепенно делать зелёным каждый раздел.
 
 ## Важно
 
@@ -68,9 +70,9 @@ make compile
 make fmt
 make fmt-check
 make test-goroutines
+make test-channels
 make test-waitgroup
 make test-race-mutex
-make test-channels
 make test-close-range
 make test-select
 make test-context
