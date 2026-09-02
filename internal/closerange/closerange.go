@@ -2,7 +2,7 @@ package closerange
 
 import "fmt"
 
-// TODO: Generate должен в отдельной goroutine отправить числа от 0 до limit-1,
+// TODO: Generate должен в отдельной горутине отправить числа от 0 до limit-1,
 // затем закрыть канал. Неположительный limit даёт сразу закрытый канал.
 func Generate(limit int) <-chan int {
 	values := make(chan int)
@@ -11,7 +11,7 @@ func Generate(limit int) <-chan int {
 }
 
 // TODO: Collect должен прочитать канал через range до закрытия.
-// nil channel трактуется как пустой вход; результат всегда ненулевой слайс.
+// nil-канал трактуется как пустой вход; результат всегда ненулевой слайс.
 func Collect(values <-chan int) []int {
 	return []int{}
 }
@@ -24,16 +24,16 @@ func FilterEven(values []int) <-chan int {
 	return result
 }
 
-// TODO: Double должен в отдельной goroutine отправить удвоенные значения
-// в исходном порядке и закрыть выходной channel даже для пустого входа.
+// TODO: Double должен в отдельной горутине отправить удвоенные значения
+// в исходном порядке и закрыть выходной канал даже для пустого входа.
 func Double(values []int) <-chan int {
 	result := make(chan int)
 	close(result)
 	return result
 }
 
-// TODO: Merge должен объединить два входных channel в один и закрыть выход
-// только после завершения обоих входов. Nil-channel трактуется как пустой вход.
+// TODO: Merge должен объединить два входных канала в один и закрыть выход
+// только после завершения обоих входов. nil-канал трактуется как пустой вход.
 // Порядок внутри каждого входа сохраняется, общий порядок между входами не задан.
 func Merge(left, right <-chan int) <-chan int {
 	result := make(chan int)

@@ -2,8 +2,10 @@ package channels
 
 import "fmt"
 
-// TODO: SendPair должен вернуть buffered channel ёмкостью 2
+// TODO: SendPair должен вернуть буферизированный канал ёмкостью 2
 // с first и second в таком порядке. Канал закрывать не нужно.
+// Важно: третья отправка до первого чтения заблокировала бы эту же функцию,
+// потому что свободного места в буфере уже нет.
 func SendPair(first, second int) <-chan int {
 	values := make(chan int, 2)
 	values <- 0
@@ -23,14 +25,16 @@ func ForwardOne(in <-chan string, out chan<- string) bool {
 	return false
 }
 
-// TODO: ReceiveOne должен получить одно значение с comma-ok.
+// TODO: ReceiveOne должен получить одно значение в форме value, ok := <-values.
 // Для закрытого канала вернуть 0, false; ноль из открытого канала — обычное значение.
+// Nil-channel сюда передавать нельзя: чтение из него не завершится.
 func ReceiveOne(values <-chan int) (int, bool) {
 	return 0, false
 }
 
 // TODO: RelayN должен переслать не более count значений из in в out и вернуть
 // количество пересланных значений. Закрытый in завершает работу раньше.
+// Out не закрывать: функция не владеет всеми возможными отправителями.
 func RelayN(in <-chan int, out chan<- int, count int) int {
 	return 0
 }

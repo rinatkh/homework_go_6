@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 )
 
-// TODO: RunAll должен запустить каждую ненулевую задачу в отдельной goroutine
+// TODO: RunAll должен запустить каждую ненулевую задачу в отдельной горутине
 // и вернуться только после завершения всех задач.
 func RunAll(tasks []func()) {}
 
@@ -21,7 +21,7 @@ func ApplyAll(values []int, fn func(int) int) []int {
 	return []int{}
 }
 
-// TODO: SumParts должен запустить отдельную goroutine для каждой части,
+// TODO: SumParts должен запустить отдельную горутину для каждой части,
 // посчитать сумму внутри части и сохранить суммы в исходном порядке частей.
 func SumParts(parts [][]int) []int {
 	return []int{}

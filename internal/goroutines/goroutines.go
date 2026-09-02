@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// TODO: ComputeAsync должен запустить вычисление в новой goroutine и вернуть канал с одним результатом.
+// TODO: ComputeAsync должен запустить вычисление в новой горутине и вернуть канал с одним результатом.
 // Если fn == nil, отправь исходное value. Канал должен иметь буфер на один элемент.
 func ComputeAsync(value int, fn func(int) int) <-chan int {
 	result := make(chan int, 1)
@@ -13,7 +13,7 @@ func ComputeAsync(value int, fn func(int) int) <-chan int {
 	return result
 }
 
-// TODO: StringAsync должен запустить преобразование строки в новой goroutine и вернуть канал с одним результатом.
+// TODO: StringAsync должен запустить преобразование строки в новой горутине и вернуть канал с одним результатом.
 // Если fn == nil, отправь исходную строку. Канал должен иметь буфер на один элемент.
 func StringAsync(value string, fn func(string) string) <-chan string {
 	result := make(chan string, 1)
@@ -21,23 +21,23 @@ func StringAsync(value string, fn func(string) string) <-chan string {
 	return result
 }
 
-// TODO: RunAsync должен запустить job в новой goroutine и закрыть done после завершения.
-// nil job не вызывает panic: goroutine просто закрывает done.
+// TODO: RunAsync должен запустить job в новой горутине и закрыть done после завершения.
+// Если job равна nil, паники быть не должно: горутина просто закрывает done.
 func RunAsync(job func()) <-chan struct{} {
 	done := make(chan struct{})
 	close(done)
 	return done
 }
 
-// TODO: SumAsync должен в новой goroutine посчитать сумму значений и отправить
-// один результат в buffered channel ёмкостью 1. Пустой вход даёт 0.
+// TODO: SumAsync должен в новой горутине посчитать сумму значений и отправить
+// один результат в буферизированный канал ёмкостью 1. Пустой вход даёт 0.
 func SumAsync(values []int) <-chan int {
 	result := make(chan int, 1)
 	result <- 0
 	return result
 }
 
-// TODO: CountAsync должен в новой goroutine посчитать строки, для которых predicate
+// TODO: CountAsync должен в новой горутине посчитать строки, для которых predicate
 // вернул true. Если predicate == nil, нужно посчитать все строки.
 func CountAsync(values []string, predicate func(string) bool) <-chan int {
 	result := make(chan int, 1)
