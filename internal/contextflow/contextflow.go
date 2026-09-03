@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-var ErrClosed = errors.New("channel closed")
+var ErrClosed = errors.New("канал закрыт")
 
 // TODO: Check должен немедленно вернуть ctx.Err(), если context завершён,
 // и nil, если работа ещё разрешена.
@@ -30,7 +30,9 @@ func Process(ctx context.Context, values []int, fn func(int) int) ([]int, error)
 // TODO: Send должен ждать, пока out примет value, или пока завершится context.
 // Успешная отправка возвращает nil, отмена — ctx.Err().
 func Send(ctx context.Context, out chan<- int, value int) error {
-	return nil
+	// Ненулевая ошибка не даёт стартовому тесту зависнуть на чтении из пустого
+	// канала. Ученице всё равно нужно заменить эту строку решением через select.
+	return errors.New("TODO: реализуйте Send")
 }
 
 // TODO: CollectN должен собрать ровно count значений, поддерживая отмену.

@@ -7,38 +7,41 @@ import (
 )
 
 var (
-	ErrTimeout = errors.New("timeout")
-	ErrClosed  = errors.New("channel closed")
+	ErrTimeout = errors.New("истекло время ожидания")
+	ErrClosed  = errors.New("канал закрыт")
 )
 
-// TODO: FirstReady должен выбрать готовый канал и вернуть value, source, true.
-// source равен "left" или "right". Закрытый выбранный канал даёт "", source, false.
+// TODO: FirstReady должен дождаться готового канала и вернуть значение,
+// название источника и true. Источник равен "left" или "right".
+// Закрытый выбранный канал даёт пустую строку, название источника и false.
 func FirstReady(left, right <-chan string) (string, string, bool) {
 	return "", "", false
 }
 
-// TODO: TrySend должен неблокирующе отправить value.
-// Если канал не готов принять значение, вернуть false через default.
+// TODO: TrySend должен попытаться отправить value без ожидания.
+// Если канал не готов принять значение, ветка default сразу возвращает false.
 func TrySend(out chan<- int, value int) bool {
 	return false
 }
 
 // TODO: ReceiveOrTimeout должен вернуть значение из in, ErrClosed для закрытого in
-// или ErrTimeout, когда первым готов timeout.
+// или ErrTimeout, когда первым готов канал тайм-аута.
 func ReceiveOrTimeout(in <-chan string, timeout <-chan time.Time) (string, error) {
 	return "", nil
 }
 
-// TODO: TryReceive должен неблокирующе получить одно число.
+// TODO: TryReceive должен попытаться получить одно число без ожидания.
 // Вернуть value, true только для реально полученного значения; nil, пустой
 // или закрытый канал дают 0, false.
 func TryReceive(in <-chan int) (int, bool) {
 	return 0, false
 }
 
-// TODO: PrimaryOrFallback должен сначала неблокирующе проверить primary.
-// Если primary не готов, ждать значение из primary или fallback. Закрытый входной канал
-// отключается; когда оба входных канала закрыты или равны nil, вернуть "", "", false.
+// TODO: PrimaryOrFallback должен сначала проверить основной канал primary без ожидания.
+// Если он не готов, нужно ждать значение из основного или запасного канала.
+// В сигнатуре запасной канал называется fallback.
+// Закрытый вход отключается; когда оба входа закрыты или равны nil,
+// вернуть "", "", false.
 func PrimaryOrFallback(primary, fallback <-chan string) (string, string, bool) {
 	return "", "", false
 }

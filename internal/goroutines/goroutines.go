@@ -37,8 +37,8 @@ func SumAsync(values []int) <-chan int {
 	return result
 }
 
-// TODO: CountAsync должен в новой горутине посчитать строки, для которых predicate
-// вернул true. Если predicate == nil, нужно посчитать все строки.
+// TODO: CountAsync должен в новой горутине посчитать строки, для которых функция
+// проверки predicate вернула true. Если predicate == nil, нужно посчитать все строки.
 func CountAsync(values []string, predicate func(string) bool) <-chan int {
 	result := make(chan int, 1)
 	result <- 0

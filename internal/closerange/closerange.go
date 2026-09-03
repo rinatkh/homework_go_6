@@ -10,7 +10,8 @@ func Generate(limit int) <-chan int {
 	return values
 }
 
-// TODO: Collect должен прочитать канал через range до закрытия.
+// TODO: Collect должен прочитать канал циклом range до закрытия.
+// Если отправитель не закроет канал, цикл будет ждать следующее значение.
 // nil-канал трактуется как пустой вход; результат всегда ненулевой слайс.
 func Collect(values <-chan int) []int {
 	return []int{}

@@ -12,18 +12,18 @@ CMDS := 01_goroutines 02_channels 03_waitgroup 04_race_mutex 05_close_range 06_s
 .PHONY: help deps-check mod-check fmt fmt-check vet test test-unit test-integration test-race coverage coverage-check build package clean run-all ci compile test-goroutines test-channels test-waitgroup test-race-mutex test-close-range test-select test-context test-generics $(addprefix run-,$(CMDS))
 
 help:
-	@echo "Available commands:"
-	@echo "  make compile          - compile all packages without running tests"
-	@echo "  make test-goroutines  - run goroutine tasks"
-	@echo "  make test-channels    - run channel tasks"
-	@echo "  make test-waitgroup   - run WaitGroup tasks"
-	@echo "  make test-race-mutex  - run shared-state tasks"
-	@echo "  make test-close-range - run close/range tasks"
-	@echo "  make test-select      - run select tasks"
-	@echo "  make test-context     - run context tasks"
-	@echo "  make test-generics    - run generics tasks"
-	@echo "  make test-race        - run all unit tests with race detector"
-	@echo "  make ci               - full local CI after solving all tasks"
+	@echo "Доступные команды:"
+	@echo "  make compile          - скомпилировать все пакеты без запуска тестов"
+	@echo "  make test-goroutines  - проверить задачи про горутины"
+	@echo "  make test-channels    - проверить задачи про каналы"
+	@echo "  make test-waitgroup   - проверить задачи про WaitGroup"
+	@echo "  make test-race-mutex  - проверить задачи про общую память"
+	@echo "  make test-close-range - проверить задачи про close и range"
+	@echo "  make test-select      - проверить задачи про select"
+	@echo "  make test-context     - проверить задачи про context"
+	@echo "  make test-generics    - проверить задачи про параметры типов"
+	@echo "  make test-race        - запустить модульные тесты с детектором гонок"
+	@echo "  make ci               - полная проверка после решения всех задач"
 
 deps-check:
 	$(GO) mod download
@@ -35,7 +35,7 @@ mod-check:
 		git diff --exit-code -- go.mod; \
 		if [ -f go.sum ]; then git diff --exit-code -- go.sum; fi; \
 	else \
-		echo "Skipping git diff because this directory is not a git repository"; \
+		echo "Проверка git diff пропущена: каталог не является Git-репозиторием"; \
 	fi
 
 fmt:

@@ -164,7 +164,7 @@ func TestCountAsyncStartsWorker(t *testing.T) {
 	select {
 	case <-started:
 	case <-time.After(time.Second):
-		t.Fatal("CountAsync did not start predicate in a goroutine")
+		t.Fatal("CountAsync не запустил функцию проверки в отдельной горутине")
 	}
 
 	select {
