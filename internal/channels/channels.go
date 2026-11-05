@@ -1,6 +1,8 @@
 package channels
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // TODO: SendPair должен вернуть буферизированный канал ёмкостью 2
 // с first и second в таком порядке. Канал закрывать не нужно.
@@ -8,35 +10,60 @@ import "fmt"
 // потому что свободного места в буфере уже нет.
 func SendPair(first, second int) <-chan int {
 	values := make(chan int, 2)
-	values <- 0
-	values <- 0
+	values <- first
+	values <- second
 	return values
 }
 
 // TODO: SumN должен получить ровно count значений и вернуть их сумму.
 // count <= 0 возвращает 0 и ничего не читает из канала.
 func SumN(values <-chan int, count int) int {
-	return 0
+	if count <= 0 {
+		return 0
+	}
+	sum := 0
+	for range count {
+		sum += <-values
+	}
+	return sum
 }
 
 // TODO: ForwardOne должен получить одно значение из in и отправить его в out.
 // Если in закрыт, ничего не отправлять и вернуть false; иначе вернуть true.
 func ForwardOne(in <-chan string, out chan<- string) bool {
-	return false
+	value, ok := <-in
+	if ok == false {
+		return false
+	}
+	out <- value
+	return true
 }
 
 // TODO: ReceiveOne должен получить одно значение в форме value, ok := <-values.
 // Для закрытого канала вернуть 0, false; ноль из открытого канала — обычное значение.
 // Nil-канал сюда передавать нельзя: чтение из него не завершится.
 func ReceiveOne(values <-chan int) (int, bool) {
-	return 0, false
+	value, ok := <-values
+	if ok == false {
+		return 0, false
+	}
+	return value, true
 }
 
 // TODO: RelayN должен переслать не более count значений из in в out и вернуть
 // количество пересланных значений. Закрытый in завершает работу раньше.
 // Канал out не закрывать: функция не владеет всеми возможными отправителями.
 func RelayN(in <-chan int, out chan<- int, count int) int {
-	return 0
+	num := 0
+	for i := 0; i < count; i++ {
+		value, ok := <-in
+		if !ok {
+			return num
+		}
+		out <- value
+		num++
+	}
+	return num
 }
 
 func Example() string {

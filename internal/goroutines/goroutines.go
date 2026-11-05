@@ -9,7 +9,13 @@ import (
 // Если fn == nil, отправь исходное value. Канал должен иметь буфер на один элемент.
 func ComputeAsync(value int, fn func(int) int) <-chan int {
 	result := make(chan int, 1)
-	result <- 0
+	go func() {
+		if fn == nil {
+			result <- value
+			return
+		}
+		result <- fn(value)
+	}()
 	return result
 }
 
@@ -17,7 +23,13 @@ func ComputeAsync(value int, fn func(int) int) <-chan int {
 // Если fn == nil, отправь исходную строку. Канал должен иметь буфер на один элемент.
 func StringAsync(value string, fn func(string) string) <-chan string {
 	result := make(chan string, 1)
-	result <- ""
+	go func() {
+		if fn == nil {
+			result <- value
+			return
+		}
+		result <- fn(value)
+	}()
 	return result
 }
 
@@ -25,7 +37,12 @@ func StringAsync(value string, fn func(string) string) <-chan string {
 // Если job равна nil, паники быть не должно: горутина просто закрывает done.
 func RunAsync(job func()) <-chan struct{} {
 	done := make(chan struct{})
-	close(done)
+	go func() {
+		defer close(done)
+		if job != nil {
+			job()
+		}
+	}()
 	return done
 }
 
@@ -33,7 +50,13 @@ func RunAsync(job func()) <-chan struct{} {
 // один результат в буферизированный канал ёмкостью 1. Пустой вход даёт 0.
 func SumAsync(values []int) <-chan int {
 	result := make(chan int, 1)
-	result <- 0
+	go func() {
+		sum := 0
+		for _, value := range values {
+			sum += value
+		}
+		result <- sum
+	}()
 	return result
 }
 
@@ -41,7 +64,20 @@ func SumAsync(values []int) <-chan int {
 // проверки predicate вернула true. Если predicate == nil, нужно посчитать все строки.
 func CountAsync(values []string, predicate func(string) bool) <-chan int {
 	result := make(chan int, 1)
-	result <- 0
+	go func() {
+		defer close(result)
+		count := 0
+		if predicate == nil {
+			count = len(values)
+		} else {
+			for _, value := range values {
+				if predicate(value) {
+					count++
+				}
+			}
+		}
+		result <- count
+	}()
 	return result
 }
 

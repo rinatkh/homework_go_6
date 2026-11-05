@@ -12,7 +12,14 @@ type Counter struct {
 
 // TODO: Add должен безопасно прибавить delta к общему значению.
 // Если получатель метода равен nil, вызов нужно спокойно проигнорировать.
-func (c *Counter) Add(delta int) {}
+func (c *Counter) Add(delta int) {
+	if c == nil {
+		return
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.value = c.value + delta
+}
 
 // TODO: Value должен безопасно вернуть текущее значение.
 // Если получатель метода равен nil, нужно вернуть 0.
